@@ -98,6 +98,7 @@ class Lung_Dataset(Dataset):
         for key, val in self.dataset_paths.items():
             msg += " - {}, in folder {}: {} images.\n".format(
                 key, val, self.dataset_numbers[key])
+        msg += f"Model type: {self.model_type}\n"
         print(msg)
 
     def open_img(self, group_val, class_val, index_val):
@@ -161,7 +162,11 @@ class Lung_Dataset(Dataset):
         sum = 0
         for key in keys:
             if key[:len(self.groups)] == self.groups:
+                if self.model_type == "binary2" and key[-1*len("normal"):] == "normal":
+                    continue
                 sum += self.dataset_numbers[key]
+
+
         return sum
 
     def __getitem__(self, index):
@@ -178,7 +183,7 @@ class Lung_Dataset(Dataset):
         second_val = first_val + \
             self.dataset_numbers[f'{self.groups}_infected_covid']
 
-        if self.model_type == "binary":
+        if self.model_type == "binary1":
 
             if index < first_val:
                 class_val = 'normal'
@@ -190,6 +195,21 @@ class Lung_Dataset(Dataset):
                 index = index - first_val
                 # label = torch.Tensor([0, 1])
                 label = 1
+
+            else:
+                class_val = 'infected_noncovid'
+                index = index - second_val
+                # label = torch.Tensor([0, 1])
+                label = 1
+
+        elif self.model_type == "binary2":
+            index += first_val
+
+            if index < second_val:
+                class_val = 'infected_covid'
+                index = index - first_val
+                # label = torch.Tensor([0, 1])
+                label = 0
 
             else:
                 class_val = 'infected_noncovid'
