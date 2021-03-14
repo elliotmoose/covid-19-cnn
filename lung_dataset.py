@@ -14,12 +14,15 @@ from torchvision import transforms
 import os
 
 
+from aug_data_generator import generate_augmented_data, Augmentations
+
+
 class Lung_Dataset(Dataset):
     """
     Generic Dataset class.
     """
 
-    def __init__(self, group, model_type):
+    def __init__(self, group, model_type, augmentation='vanilla'):
         """
         Constructor for generic Dataset class - simply assembles
         the important parameters in attributes.
@@ -41,23 +44,36 @@ class Lung_Dataset(Dataset):
         self.groups = group
         # self.groups = ['train', 'test', 'val']
 
+        available_augments = ['vanilla', 'hist_equal']
+
+        assert augmentation in available_augments, f'Invalid augmentation type. Choose one of {available_augments}'
+        DATASET_ROOT_DIR = f'./dataset/{augmentation}'
+
+        if not os.path.exists(DATASET_ROOT_DIR):
+            print(f'Augmentation data not available. Generating {augmentation} data now...')
+            if augmentation == 'hist_equal':
+                generate_augmented_data(augmentation, Augmentations.histEqualise)
+        else:
+            print(f'Found augmented data: {augmentation}')
+                
+
         # Number of images in each part of the dataset
-        train_normal_no = len(os.listdir('./dataset/train/normal'))
+        train_normal_no = len(os.listdir(f'{DATASET_ROOT_DIR}/train/normal'))
         train_infected_covid_no = len(
-            os.listdir('./dataset/train/infected/covid'))
+            os.listdir(f'{DATASET_ROOT_DIR}/train/infected/covid'))
         train_infected_noncovid_no = len(
-            os.listdir('./dataset/train/infected/non-covid'))
+            os.listdir(f'{DATASET_ROOT_DIR}/train/infected/non-covid'))
 
-        val_normal_no = len(os.listdir('./dataset/val/normal'))
-        val_infected_covid_no = len(os.listdir('./dataset/val/infected/covid'))
+        val_normal_no = len(os.listdir(f'{DATASET_ROOT_DIR}/val/normal'))
+        val_infected_covid_no = len(os.listdir(f'{DATASET_ROOT_DIR}/val/infected/covid'))
         val_infected_noncovid_no = len(
-            os.listdir('./dataset/val/infected/non-covid'))
+            os.listdir(f'{DATASET_ROOT_DIR}/val/infected/non-covid'))
 
-        test_normal_no = len(os.listdir('./dataset/test/normal'))
+        test_normal_no = len(os.listdir(f'{DATASET_ROOT_DIR}/test/normal'))
         test_infected_covid_no = len(
-            os.listdir('./dataset/test/infected/covid'))
+            os.listdir(f'{DATASET_ROOT_DIR}/test/infected/covid'))
         test_infected_noncovid_no = len(
-            os.listdir('./dataset/test/infected/non-covid'))
+            os.listdir(f'{DATASET_ROOT_DIR}/test/infected/non-covid'))
 
         self.dataset_numbers = {'train_normal': train_normal_no,
                                 'train_infected_covid': train_infected_covid_no,
@@ -70,15 +86,15 @@ class Lung_Dataset(Dataset):
                                 'test_infected_noncovid': test_infected_noncovid_no}
 
         # Path to images for different parts of the dataset
-        self.dataset_paths = {'train_normal': './dataset/train/normal',
-                              'train_infected_covid': './dataset/train/infected/covid',
-                              'train_infected_noncovid': './dataset/train/infected/non-covid',
-                              'val_normal': './dataset/val/normal',
-                              'val_infected_covid': './dataset/val/infected/covid',
-                              'val_infected_noncovid': './dataset/val/infected/non-covid',
-                              'test_normal': './dataset/test/normal',
-                              'test_infected_covid': './dataset/test/infected/covid',
-                              'test_infected_noncovid': './dataset/test/infected/non-covid'}
+        self.dataset_paths = {'train_normal': f'{DATASET_ROOT_DIR}/train/normal',
+                              'train_infected_covid': f'{DATASET_ROOT_DIR}/train/infected/covid',
+                              'train_infected_noncovid': f'{DATASET_ROOT_DIR}/train/infected/non-covid',
+                              'val_normal': f'{DATASET_ROOT_DIR}/val/normal',
+                              'val_infected_covid': f'{DATASET_ROOT_DIR}/val/infected/covid',
+                              'val_infected_noncovid': f'{DATASET_ROOT_DIR}/val/infected/non-covid',
+                              'test_normal': f'{DATASET_ROOT_DIR}/test/normal',
+                              'test_infected_covid': f'{DATASET_ROOT_DIR}/test/infected/covid',
+                              'test_infected_noncovid': f'{DATASET_ROOT_DIR}/test/infected/non-covid'}
 
     def describe(self):
         """

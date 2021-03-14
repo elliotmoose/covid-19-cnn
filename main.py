@@ -17,9 +17,9 @@ from model_three_class import ModelThreeClass
 from lung_dataset import Lung_Dataset
 from torch.utils.data import Dataset, DataLoader
 
-train_ld = Lung_Dataset('train', 'three_class')
+train_ld = Lung_Dataset('train', 'three_class', augmentation='hist_equal')
 
-# train_ld.describe()
+train_ld.describe()
 
 train_loader = DataLoader(train_ld, batch_size=512, shuffle=True)
 
