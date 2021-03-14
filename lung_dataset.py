@@ -51,8 +51,10 @@ class Lung_Dataset(Dataset):
 
         if not os.path.exists(DATASET_ROOT_DIR):
             print(f'Augmentation data not available. Generating {augmentation} data now...')
-            if augmentation == 'hist_equal':
-                generate_augmented_data(augmentation, Augmentations.histEqualise)
+            if augmentation == 'hist_equal':                
+                generate_augmented_data(Augmentations.HIST_EQUALISE)
+            elif augmentation == 'flip':
+                generate_augmented_data(Augmentations.FLIP)
         else:
             print(f'Found augmented data: {augmentation}')
                 
