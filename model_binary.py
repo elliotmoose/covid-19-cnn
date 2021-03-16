@@ -13,7 +13,7 @@ from torchsummary import summary
 
 class Model_binary(nn.Module):
     def __init__(self):
-        super(Model_binary_1, self).__init__()
+        super(Model_binary, self).__init__()
         
         # input img = 150x150
         # First block of Residual Block (3x3x16/2) + Pooling(2x2/2), output size = 19x19x16
@@ -73,7 +73,7 @@ class Model_binary(nn.Module):
 
 class Model_binary_bn(nn.Module):
     def __init__(self):
-        super(Model_binary_1, self).__init__()
+        super(Model_binary_bn, self).__init__()
         
         # input img = 150x150
         # First block of Residual Block (3x3x16/2) + Pooling(2x2/2), output size = 19x19x16
@@ -157,7 +157,7 @@ def validation(model, testloader, criterion, device):
 
     return test_loss, accuracy
 
-def test_model(model, testloader, device='cuda'):  
+def test(model, testloader, device='cuda'):  
     model.to(device)
     accuracy = 0
     with torch.no_grad():
@@ -174,7 +174,7 @@ def test_model(model, testloader, device='cuda'):
         print('Testing Accuracy: {:.3f}'.format(accuracy/len(testloader)))
 
 
-def train(model, batch_size, n_epochs, lr, device = "cuda", train_loader, val_loader, print_every=40, save_every=50, saved_model_path):
+def train(model, model_name, batch_size, n_epochs, lr, train_loader, val_loader, saved_model_path, device = "cuda", print_every=40, save_every=50):
     input_sample, _ =  next(iter(train_loader))
     print(summary(model, tuple(input_sample.shape[1:]), device=device))
 
@@ -184,6 +184,7 @@ def train(model, batch_size, n_epochs, lr, device = "cuda", train_loader, val_lo
     train_loss_ls = []
     val_loss_ls = []
     
+    steps =0
     running_loss = 0.0
     for e in range(n_epochs):  # loop over the dataset multiple times
 
@@ -206,7 +207,7 @@ def train(model, batch_size, n_epochs, lr, device = "cuda", train_loader, val_lo
             # print statistics
             running_loss += loss.item()
             if steps % save_every == 0:
-                filepath = saved_model_path + f"b{batch_size}-e{n_epochs}.pt"
+                filepath = saved_model_path + f"{model_name}-b{batch_size}-e{e}-step{steps}.pt"
                 torch.save(model, filepath)
 
             if steps % print_every == 0:
