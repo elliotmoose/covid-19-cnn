@@ -70,7 +70,6 @@ class Lung_Dataset(Dataset):
         val_infected_covid_no = len(os.listdir(f'{DATASET_ROOT_DIR}/val/infected/covid'))
         val_infected_noncovid_no = len(
             os.listdir(f'{DATASET_ROOT_DIR}/val/infected/non-covid'))
-
         test_normal_no = len(os.listdir(f'{DATASET_ROOT_DIR}/test/normal'))
         test_infected_covid_no = len(
             os.listdir(f'{DATASET_ROOT_DIR}/test/infected/covid'))
@@ -183,7 +182,6 @@ class Lung_Dataset(Dataset):
                 if self.model_type == "binary2" and key[-1*len("normal"):] == "normal":
                     continue
                 sum += self.dataset_numbers[key]
-
 
         return sum
 
