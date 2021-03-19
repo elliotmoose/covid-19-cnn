@@ -9,7 +9,8 @@ import torch.nn.functional as F
 from torchvision import transforms
 from matplotlib import pyplot as plt
 from torchsummary import summary
-
+from tqdm import tqdm
+from datetime import datetime
 
 class Model_binary(nn.Module):
     def __init__(self):
@@ -178,6 +179,9 @@ def train(model, model_name, batch_size, n_epochs, lr, train_loader, val_loader,
     input_sample, _ =  next(iter(train_loader))
     print(summary(model, tuple(input_sample.shape[1:]), device=device))
 
+    start_time = datetime.now()
+
+
     criterion = nn.NLLLoss()
     optimizer = optim.Adam(model.parameters(), lr= lr) 
 
@@ -191,45 +195,51 @@ def train(model, model_name, batch_size, n_epochs, lr, train_loader, val_loader,
         # Training
         model.train()
     #     train_loader1 = DataLoader(ld_train1, batch_size=batch_size, shuffle=True)
-        for images, labels in train_loader:
-            images, labels = images.to(device), labels.to(device)
-            steps += 1
+        with tqdm(train_loader, position=0, leave=False) as progress_bar:          
+            for images, labels in progress_bar:
+                images, labels = images.to(device), labels.to(device)
+                steps += 1
 
-            # zero the parameter gradients
-            optimizer.zero_grad()
+                # zero the parameter gradients
+                optimizer.zero_grad()
 
-            # forward + backward + optimize
-            output = model.forward(images)
-            loss = criterion(output, labels)
-            loss.backward()
-            optimizer.step()
+                # forward + backward + optimize
+                output = model.forward(images)
+                loss = criterion(output, labels)
+                loss.backward()
+                optimizer.step()
 
-            # print statistics
-            running_loss += loss.item()
-            if steps % save_every == 0:
-                filepath = saved_model_path + f"{model_name}-b{batch_size}-e{e}-step{steps}.pt"
-                torch.save(model, filepath)
+                # print statistics
+                running_loss += loss.item()
+                if steps % save_every == 0:
+                    filepath = saved_model_path + f"{model_name}-b{batch_size}-e{e}-step{steps}.pt"
+                    torch.save(model, filepath)
+        # Eval mode for predictions
+        model.eval()
 
-            if steps % print_every == 0:
-                # Eval mode for predictions
-                model.eval()
+        # Turn off gradients for validation
+        with torch.no_grad():
+            test_loss, accuracy = validation(model, val_loader, criterion, device)
 
-                # Turn off gradients for validation
-                with torch.no_grad():
-                    test_loss, accuracy = validation(model, val_loader, criterion, device)
+        # print("Epoch: {}/{} - ".format(e+1, n_epochs),
+        #     "Training Loss: {:.3f} - ".format(running_loss/print_every),
+        #     "Validation Loss: {:.3f} - ".format(),
+        #     "Validation Accuracy: {:.3f}".format())
+        
+        time_elapsed = (datetime.now() - start_time)
 
-                print("Epoch: {}/{} - ".format(e+1, n_epochs),
-                      "Training Loss: {:.3f} - ".format(running_loss/print_every),
-                      "Validation Loss: {:.3f} - ".format(test_loss/len(val_loader)),
-                      "Validation Accuracy: {:.3f}".format(accuracy/len(val_loader)))
-                
-                train_loss_ls.append(running_loss/print_every)
-                val_loss_ls.append(test_loss/len(val_loader))
-                running_loss = 0
-                
+        tqdm.write(f'\n===Epoch: {e+1}===')
+        tqdm.write(f'== Loss: {running_loss:.3f} Time: {datetime.now()} Elapsed: {time_elapsed}')    
+        tqdm.write(f'== Val Loss: {test_loss/len(val_loader):.3f} Val Accuracy: {accuracy/len(val_loader):.3f}') 
 
-                # Make sure training is back on
-                model.train()
+        train_loss_ls.append(running_loss) #/print_every
+        val_loss_ls.append(test_loss/len(val_loader))
+        running_loss = 0
+        
+
+        # Make sure training is back on
+        model.train()
+                    
 
     print("Finished training")
     plt.plot(train_loss_ls, label = "train_loss")

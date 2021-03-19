@@ -11,54 +11,48 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
 from torchvision import transforms
-
-
 from lung_dataset import Lung_Dataset
 from torch.utils.data import Dataset, DataLoader
 
-
-train_ld = Lung_Dataset('train', 'three_class', augmentation='hist_equal')
-
-from aug_data_generator import plot_comparison
-plot_comparison('hist_equal')
+import model_binary
 
 
+# train_ld = Lung_Dataset('train', 'three_class', augmentation='hist_equal')
+# from aug_data_generator import plot_comparison
+# plot_comparison('hist_equal')
 
-# train_ld.describe()
+ld_train1 = Lung_Dataset("train", "binary1")
+ld_val1 = Lung_Dataset("val", "binary1")
+ld_test1 = Lung_Dataset("test", "binary1")
 
-# train_loader = DataLoader(train_ld, batch_size=512, shuffle=True)
-
-# from model_three_class import ModelThreeClass
-
-# def train_model(model, epochs=10):
-#     model.train()
-
-#     # maxCoutn = 10
-#     # curCount = 0
-#     for i in range(epochs):
-#         running_loss = 0
-#         for batch_idx, (images_data, target_labels) in enumerate(train_loader):
-#             prediction = model(images_data)
-#             loss = nn.CrossEntropyLoss()
-#             output = loss(prediction, target_labels)
-#             output.backward()
-#             optim = torch.optim.Adam(model.parameters(), lr=1e-3)
-#             optim.step()  # gradient descent
-
-#             # print('pred:', np.argmax(prediction.detach().numpy(), axis=1))
-#             # print('target:', target_labels)
-#             print(output.item())
-#             running_loss += output.item()
-
-#             # curCount += 1
-#             # if curCount > maxCoutn:
-#             #     break
-
-#         print(f'Epoch: {i} Loss: {running_loss}')
+ld_train2 = Lung_Dataset("train", "binary2")
+ld_val2 = Lung_Dataset("val", "binary2")
+ld_test2 = Lung_Dataset("test", "binary2")
+# print(ld_train1.describe())
 
 
-# model_three_class = ModelThreeClass()
-# train_model(model_three_class)
+batch_size = 128
+n_epochs = 20
+lr = 0.00001
+saved_model_path =  "./model/"
+device = "cpu"
+# device = "cuda"
+
+classifier1 = model_binary.Model_binary_bn()
+classifier2 = model_binary.Model_binary_bn()
+
+classifier1.to(device)
+classifier2.to(device)
+
+train_loader1 = DataLoader(ld_train1, batch_size=batch_size, shuffle=True)
+val_loader1 = DataLoader(ld_val1, batch_size=batch_size, shuffle=True)
+test_loader1 = DataLoader(ld_test1, batch_size=batch_size, shuffle=True)
+
+train_loader2 = DataLoader(ld_train2, batch_size=batch_size, shuffle=True)
+val_loader2 = DataLoader(ld_val2, batch_size=batch_size, shuffle=True)
+test_loader2 = DataLoader(ld_test2, batch_size=batch_size, shuffle=True)
 
 
-# # print(torch.cuda.is_available())
+trained_classifier1 = model_binary.train(classifier1, 'bn_class_1', batch_size, n_epochs, lr, train_loader1, val_loader1, saved_model_path, device)
+model_binary.test_model(trained_classifier1,test_loader1, device)
+trained_classifier2 = model_binary.train(classifier2, 'bn_class_2', batch_size, n_epochs, lr, train_loader2, val_loader2, saved_model_path, device)
