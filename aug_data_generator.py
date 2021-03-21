@@ -61,6 +61,7 @@ def generate_augmented_data(augmentation):
                         imagepath = folder + "/" + image
                         img = cv.imread(imagepath)
                         flip = cv.flip(img, 1)
+                        img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
                         cv.imwrite("./dataset/flip/" + settype +
                                     "/normal/" + str(count) + ".jpg", flip)
                         count += 1
@@ -75,6 +76,7 @@ def generate_augmented_data(augmentation):
                         imagepath = folder + "/" + image
                         img = cv.imread(imagepath)
                         flip = cv.flip(img, 1)
+                        img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
                         cv.imwrite("./dataset/flip/" + settype +
                                     "/infected/covid/" + str(count) + ".jpg", flip)
                         count += 1
@@ -89,6 +91,7 @@ def generate_augmented_data(augmentation):
                         imagepath = folder + "/" + image
                         img = cv.imread(imagepath)
                         flip = cv.flip(img, 1)
+                        img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
                         cv.imwrite("./dataset/flip/" + settype +
                                     "/infected/non-covid/" + str(count) + ".jpg", flip)
                         count += 1
@@ -115,6 +118,7 @@ def generate_augmented_data(augmentation):
                         hsv[:,:,2][hsv[:,:,2]>255] = 255
                         hsv = np.array(hsv, dtype=np.uint8)
                         adjusted = cv.cvtColor(hsv, cv.COLOR_HSV2BGR)
+                        adjusted = cv2.cvtColor(adjusted, cv2.COLOR_BGR2GRAY)
                         cv.imwrite("./dataset/brightness/" + settype +
                                     "/normal/" + str(count) + ".jpg", adjusted)
                         count += 1
@@ -137,6 +141,7 @@ def generate_augmented_data(augmentation):
                         hsv[:,:,2][hsv[:,:,2]>255] = 255
                         hsv = np.array(hsv, dtype=np.uint8)
                         adjusted = cv.cvtColor(hsv, cv.COLOR_HSV2BGR)
+                        adjusted = cv2.cvtColor(adjusted, cv2.COLOR_BGR2GRAY)
                         cv.imwrite("./dataset/brightness/" + settype +
                                     "/infected/covid/" + str(count) + ".jpg", adjusted)
                         count += 1
@@ -159,6 +164,7 @@ def generate_augmented_data(augmentation):
                         hsv[:,:,2][hsv[:,:,2]>255] = 255
                         hsv = np.array(hsv, dtype=np.uint8)
                         adjusted = cv.cvtColor(hsv, cv.COLOR_HSV2BGR)
+                        adjusted = cv2.cvtColor(adjusted, cv2.COLOR_BGR2GRAY)
                         cv.imwrite("./dataset/brightness/" + settype +
                                     "/infected/non-covid/" + str(count) + ".jpg", adjusted)
                         count += 1
