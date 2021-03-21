@@ -57,7 +57,7 @@ def plot_comparison(augmentation):
         axes[i, 0].title.set_text(f'{i}.jpg')
         axes[i, 1].imshow(img_b)
         axes[i, 1].title.set_text(f'{i}.jpg')
-
+    plt.tight_layout()
     plt.show()
 
 class Augmentations():

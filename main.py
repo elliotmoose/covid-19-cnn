@@ -68,7 +68,8 @@ trained_classifier2 = model_trainer.train(classifier2, 'bn_class_2', batch_size,
 
 #show confusion matrix
 sn.set(font_scale=1.4)
-sn.heatmap(confusion_matrix, annot=True, annot_kws={"size": 16})
+ax = sn.heatmap(confusion_matrix, annot=True, annot_kws={"size": 16})
+ax.set(xlabel='Predicted Class', ylabel='True Class')
 plt.show()
 
 #====================================================================================
@@ -85,14 +86,15 @@ train_loader3 = DataLoader(ld_train3, batch_size=batch_size, shuffle=True)
 val_loader3 = DataLoader(ld_val3, batch_size=batch_size, shuffle=True)
 test_loader3 = DataLoader(ld_test3, batch_size=batch_size, shuffle=True)
 
-three_classifier = model_three_class.ModelThreeClassLite()
+three_classifier = model_three_class.ModelThreeClass()
 
-trained_three_classifier = model_trainer.train(three_classifier, 'three_class', batch_size, n_epochs, lr, train_loader3, test_loader3, saved_model_path, device)
-accuracy, confusion_matrix = model_trainer.test(trained_three_classifier,test_loader3, device)
+trained_three_classifier = model_trainer.train(three_classifier, 'three_class', batch_size, n_epochs, lr, train_loader3, test_loader3, saved_model_path, device, num_classes=3)
+accuracy, confusion_matrix = model_trainer.test(trained_three_classifier,test_loader3, device, num_classes=3)
 
 #show confusion matrix
 sn.set(font_scale=1.4)
-sn.heatmap(confusion_matrix, annot=True, annot_kws={"size": 16})
+ax = sn.heatmap(confusion_matrix, annot=True, annot_kws={"size": 16})
+ax.set(xlabel='Predicted Class', ylabel='True Class')
 plt.show()
 
 #====================================================================================
