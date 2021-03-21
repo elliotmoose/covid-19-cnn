@@ -1,3 +1,5 @@
+import metrics
+
 #[true, predicted]
 def recall(confusion_matrix, num_classes=2):
     if num_classes == 2:
@@ -23,7 +25,7 @@ def precision(confusion_matrix, num_classes=2):
         return tp/(tp + fp)
 
 def f1(confusion_matrix, num_classes=2):
-    precision = precision(confusion_matrix, num_classes)
-    recall = recall(confusion_matrix, num_classes)
+    precision = metrics.precision(confusion_matrix, num_classes)
+    recall = metrics.recall(confusion_matrix, num_classes)
     return (2 * precision * recall) / (precision + recall);
     
