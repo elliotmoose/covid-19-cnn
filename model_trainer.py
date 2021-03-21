@@ -127,6 +127,11 @@ def train(model, model_name, batch_size, n_epochs, lr, train_loader, val_loader,
 
     train_loss_ls = []
     val_loss_ls = []
+
+    best_accuracy = 0
+    best_recall = 0
+    best_accuracy_weights = None
+    best_recall_weights = None
     
     running_loss = 0.0
     for e in range(n_epochs):  # loop over the dataset multiple times
@@ -175,6 +180,16 @@ def train(model, model_name, batch_size, n_epochs, lr, train_loader, val_loader,
         tqdm.write(f'== Val Loss: {test_loss/len(val_loader):.3f} Val Accuracy: {accuracy/len(val_loader):.3f}') 
         tqdm.write(f'== Val Recall: {recall:.3f} Val Precision: {precision:.3f} Val F1: {f1:.3f}')
 
+        if recall > best_recall:
+            best_recall_weights = model.state_dict()
+            best_recall = recall
+            tqdm.write(f'\n=== BEST RECALL!!! ===')
+        
+        if accuracy > best_accuracy:
+            best_accuracy_weights = model.state_dict()
+            best_accuracy = accuracy
+            tqdm.write(f'\n=== BEST ACCURACY!!! ===')
+
         train_loss_ls.append(running_loss) #/print_every
         val_loss_ls.append(test_loss/len(val_loader))
         running_loss = 0        
@@ -189,4 +204,4 @@ def train(model, model_name, batch_size, n_epochs, lr, train_loader, val_loader,
     plt.legend()
     plt.savefig(saved_model_path+'train_val_loss.png')
     plt.show()
-    return model
+    return model.state_dict(), best_accuracy_weights, best_recall_weights

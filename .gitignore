@@ -1,2 +1,4 @@
 dataset/hist_equal
+dataset/brightness
+dataset/flip
 __pycache__
