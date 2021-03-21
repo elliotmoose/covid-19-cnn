@@ -44,7 +44,7 @@ class Lung_Dataset(Dataset):
         self.groups = group
         # self.groups = ['train', 'test', 'val']
 
-        available_augments = ['vanilla', 'hist_equal']
+        available_augments = ['vanilla', 'hist_equal', 'flip', 'brightness']
 
         assert augmentation in available_augments, f'Invalid augmentation type. Choose one of {available_augments}'
         DATASET_ROOT_DIR = f'./dataset/{augmentation}'
@@ -55,6 +55,8 @@ class Lung_Dataset(Dataset):
                 generate_augmented_data(Augmentations.HIST_EQUALISE)
             elif augmentation == 'flip':
                 generate_augmented_data(Augmentations.FLIP)
+            elif augmentation == 'brightness':
+                generate_augmented_data(Augmentations.BRIGHTNESS)
         else:
             print(f'Found augmented data: {augmentation}')
                 

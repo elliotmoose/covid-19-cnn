@@ -19,8 +19,7 @@ import model_binary
 import model_three_class
 import model_trainer
 import metrics
-
-# train_ld = Lung_Dataset('train', 'three_class', augmentation='hist_equal')
+train_ld = Lung_Dataset('train', 'three_class', augmentation='brightness')
 # from aug_data_generator import plot_comparison
 # plot_comparison('hist_equal')
 
