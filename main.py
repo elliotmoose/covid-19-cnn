@@ -107,13 +107,13 @@ fig, axes = plt.subplots(8, 3,figsize=(10,10))
 labels = ["normal", "infected covid", "infected non-covid"]
 trained_three_classifier.eval()
 for i, (img, label) in enumerate(val_dataloader):
+    img, label = img.to(device), label.to(device)
     groundTruth = labels[label]
-    img, groundTruth = img.to(device), groundTruth.to(device)
     output = trained_three_classifier(img)
     prediction = labels[output.max(dim=1)[1]]
     # print(prediction)
 
-    axes[i % 8, label].imshow(img.reshape(150, 150))
+    axes[i % 8, label].imshow(img.cpu().reshape(150, 150))
     axes[i % 8, label].set_title(f"Ground Truth: {groundTruth} \n Prediction: {prediction}", size=7)
 
 # plt.subplots_adjust(hspace=20)
