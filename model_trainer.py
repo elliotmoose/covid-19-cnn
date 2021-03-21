@@ -72,6 +72,45 @@ def test(model, testloader, device='cuda', num_classes=2):
 
     return accuracy, confusion_matrix
 
+def test_binary(classifier1, classifier2, testloader, device='cuda', num_classes=3):
+    classifier1.to(device)
+    classifier2.to(device)
+    accuracy = 0
+    confusion_matrix = torch.zeros(num_classes, num_classes)
+    
+    with torch.no_grad():
+        classifier1.eval()
+        classifier2.eval()
+        for images, labels in testloader:
+            images, labels = images.to(device), labels.to(device)
+                    
+            output = classifier1(images)
+            
+            ps = torch.exp(output)
+            predictions = ps.max(dim=1)[1]
+            
+            if predictions == 1:
+                output = classifier2(images)
+                ps = torch.exp(output)
+                predictions = ps.max(dim=1)[1] + 1
+                
+                
+            equality = (labels.data == predictions)
+            accuracy += equality.type(torch.FloatTensor).mean()
+
+            for t, p in zip(labels.view(-1), predictions.view(-1)):
+                confusion_matrix[t.long(), p.long()] += 1
+        
+
+        recall = metrics.recall(confusion_matrix, num_classes)
+        precision = metrics.precision(confusion_matrix, num_classes)
+        f1 = metrics.f1(confusion_matrix, num_classes)
+        print('Testing accuracy: {:.3f}'.format(accuracy/len(testloader)))
+        print(f'Testing recall: {recall:.3f}')
+        print(f'Testing precision: {precision:.3f}')
+        print(f'Testing f1: {f1:.3f}')
+
+    return accuracy, confusion_matrix
 
 def train(model, model_name, batch_size, n_epochs, lr, train_loader, val_loader, saved_model_path, device = "cuda", num_classes=2, use_lr_scheduler = False):
     input_sample, _ =  next(iter(train_loader))

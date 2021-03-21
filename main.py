@@ -19,7 +19,7 @@ import model_binary
 import model_three_class
 import model_trainer
 import metrics
-train_ld = Lung_Dataset('train', 'three_class', augmentation='brightness')
+train_ld = Lung_Dataset('train', 'three_class', augmentation='vanilla')
 # from aug_data_generator import plot_comparison
 # plot_comparison('hist_equal')
 
@@ -61,8 +61,12 @@ test_loader2 = DataLoader(ld_test2, batch_size=batch_size, shuffle=True)
 
 
 trained_classifier1 = model_trainer.train(classifier1, 'bn_class_1', batch_size, n_epochs, lr, train_loader1, test_loader1, saved_model_path, device)
-accuracy, confusion_matrix = model_trainer.test(trained_classifier1,test_loader1, device)
 trained_classifier2 = model_trainer.train(classifier2, 'bn_class_2', batch_size, 30, lr, train_loader2, test_loader2, saved_model_path, device)
+
+ld_test3 = Lung_Dataset("test", "three_class")
+test_loader3 = DataLoader(ld_test3, batch_size=1, shuffle=True)
+accuracy, confusion_matrix = model_trainer.test_binary(trained_classifier1, trained_classifier2 ,test_loader3, device)
+
 
 #show confusion matrix
 metrics.show_confusion(confusion_matrix)
