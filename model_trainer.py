@@ -2,6 +2,7 @@ from torchsummary import summary
 import torch
 import torch.nn as nn
 import torch.optim as optim
+import torch.optim.lr_scheduler as lr_scheduler
 from tqdm import tqdm
 from datetime import datetime
 from matplotlib import pyplot as plt
@@ -72,7 +73,7 @@ def test(model, testloader, device='cuda', num_classes=2):
     return accuracy, confusion_matrix
 
 
-def train(model, model_name, batch_size, n_epochs, lr, train_loader, val_loader, saved_model_path, device = "cuda", num_classes=2):
+def train(model, model_name, batch_size, n_epochs, lr, train_loader, val_loader, saved_model_path, device = "cuda", num_classes=2, use_lr_scheduler = False):
     input_sample, _ =  next(iter(train_loader))
     print(summary(model, tuple(input_sample.shape[1:]), device=device))
 
@@ -80,7 +81,10 @@ def train(model, model_name, batch_size, n_epochs, lr, train_loader, val_loader,
 
 
     criterion = nn.NLLLoss()
-    optimizer = optim.Adam(model.parameters(), lr= lr) 
+    optimizer = optim.Adam(model.parameters(), lr= lr)
+    if use_lr_scheduler:
+        scheduler = lr_scheduler.StepLR(optimizer, step_size=5, gamma=0.01)
+
 
     train_loss_ls = []
     val_loss_ls = []
@@ -106,6 +110,10 @@ def train(model, model_name, batch_size, n_epochs, lr, train_loader, val_loader,
 
                 # print statistics
                 running_loss += loss.item()
+        
+        if use_lr_scheduler:
+            # Decay the learning rate
+            scheduler.step()
         
         # Eval mode for predictions
         model.eval()

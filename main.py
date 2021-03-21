@@ -45,8 +45,8 @@ saved_model_path =  "./model/"
 # device = "cpu"
 device = "cuda"
 
-classifier1 = model_binary.Model_binary_bn()
-classifier2 = model_binary.Model_binary_bn()
+classifier1 = model_binary.Model_binary_bn(classifier=1)
+classifier2 = model_binary.Model_binary_bn(classifier=2)
 
 classifier1.to(device)
 classifier2.to(device)
@@ -62,7 +62,7 @@ test_loader2 = DataLoader(ld_test2, batch_size=batch_size, shuffle=True)
 
 trained_classifier1 = model_trainer.train(classifier1, 'bn_class_1', batch_size, n_epochs, lr, train_loader1, test_loader1, saved_model_path, device)
 accuracy, confusion_matrix = model_trainer.test(trained_classifier1,test_loader1, device)
-trained_classifier2 = model_trainer.train(classifier2, 'bn_class_2', batch_size, n_epochs, lr, train_loader2, test_loader2, saved_model_path, device)
+trained_classifier2 = model_trainer.train(classifier2, 'bn_class_2', batch_size, 30, lr, train_loader2, test_loader2, saved_model_path, device)
 
 #show confusion matrix
 metrics.show_confusion(confusion_matrix)
