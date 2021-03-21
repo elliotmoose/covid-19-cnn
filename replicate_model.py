@@ -20,7 +20,7 @@ import model_three_class
 import model_trainer
 import metrics
 
-
+device ="cpu"
 ld_test3 = Lung_Dataset("test", "three_class")
 test_loader3 = DataLoader(ld_test3, batch_size=1, shuffle=True)
 
