@@ -1,4 +1,6 @@
 import metrics
+import matplotlib.pyplot as plt
+import seaborn as sn
 
 #[true, predicted]
 def recall(confusion_matrix, num_classes=2):
@@ -29,3 +31,12 @@ def f1(confusion_matrix, num_classes=2):
     recall = metrics.recall(confusion_matrix, num_classes)
     return (2 * precision * recall) / (precision + recall);
     
+
+def show_confusion(confusion_matrix):
+    sn.set(font_scale=1.4)
+    ax = sn.heatmap(confusion_matrix, annot=True, annot_kws={"size": 16})
+    ax.set(xlabel='Predicted Class', ylabel='True Class')
+    ticklabels = ['Normal', 'Inf Covid', 'Inf Non-Covid']
+    ax.set_xticklabels(ticklabels, size=8)
+    ax.set_yticklabels(ticklabels, size=8)
+    plt.show()

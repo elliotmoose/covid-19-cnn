@@ -18,6 +18,7 @@ from torch.utils.data import Dataset, DataLoader
 import model_binary
 import model_three_class
 import model_trainer
+import metrics
 
 # train_ld = Lung_Dataset('train', 'three_class', augmentation='hist_equal')
 # from aug_data_generator import plot_comparison
@@ -65,10 +66,7 @@ accuracy, confusion_matrix = model_trainer.test(trained_classifier1,test_loader1
 trained_classifier2 = model_trainer.train(classifier2, 'bn_class_2', batch_size, n_epochs, lr, train_loader2, test_loader2, saved_model_path, device)
 
 #show confusion matrix
-sn.set(font_scale=1.4)
-ax = sn.heatmap(confusion_matrix, annot=True, annot_kws={"size": 16})
-ax.set(xlabel='Predicted Class', ylabel='True Class')
-plt.show()
+metrics.show_confusion(confusion_matrix)
 
 #====================================================================================
 #========================         THREE CLASSIFIER         ==========================
@@ -91,10 +89,7 @@ trained_three_classifier = model_trainer.train(three_classifier, 'three_class', 
 accuracy, confusion_matrix = model_trainer.test(trained_three_classifier,test_loader3, device, num_classes=3)
 
 #show confusion matrix
-sn.set(font_scale=1.4)
-ax = sn.heatmap(confusion_matrix, annot=True, annot_kws={"size": 16})
-ax.set(xlabel='Predicted Class', ylabel='True Class')
-plt.show()
+metrics.show_confusion(confusion_matrix)
 
 #====================================================================================
 #=======================         VALIDATION DISPLAY         =========================
@@ -113,8 +108,11 @@ for i, (img, label) in enumerate(val_dataloader):
     prediction = labels[output.max(dim=1)[1]]
     # print(prediction)
 
-    axes[i % 8, label].imshow(img.cpu().reshape(150, 150))
-    axes[i % 8, label].set_title(f"Ground Truth: {groundTruth} \n Prediction: {prediction}", size=7)
+    ax = axes[i % 8, label]
+    ax.imshow(img.cpu().reshape(150, 150))
+    ax.set_title(f"Ground Truth: {groundTruth} \n Prediction: {prediction}", size=7)
+    ax.xaxis.set_visible(False)
+    ax.yaxis.set_visible(False)
 
 # plt.subplots_adjust(hspace=20)
 plt.tight_layout()

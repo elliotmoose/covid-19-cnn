@@ -60,7 +60,14 @@ def test(model, testloader, device='cuda', num_classes=2):
             for t, p in zip(labels.view(-1), predictions.view(-1)):
                 confusion_matrix[t.long(), p.long()] += 1
         
-        print('Testing Accuracy: {:.3f}'.format(accuracy/len(testloader)))
+
+        recall = metrics.recall(confusion_matrix, num_classes)
+        precision = metrics.precision(confusion_matrix, num_classes)
+        f1 = metrics.f1(confusion_matrix, num_classes)
+        print('Testing accuracy: {:.3f}'.format(accuracy/len(testloader)))
+        print(f'Testing recall: {recall:.3f}')
+        print(f'Testing precision: {precision:.3f}')
+        print(f'Testing f1: {f1:.3f}')
 
     return accuracy, confusion_matrix
 
