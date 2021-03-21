@@ -85,6 +85,7 @@ val_loader3 = DataLoader(ld_val3, batch_size=batch_size, shuffle=True)
 test_loader3 = DataLoader(ld_test3, batch_size=batch_size, shuffle=True)
 
 three_classifier = model_three_class.ModelThreeClass()
+three_classifier.to(device)
 
 trained_three_classifier = model_trainer.train(three_classifier, 'three_class', batch_size, n_epochs, lr, train_loader3, test_loader3, saved_model_path, device, num_classes=3)
 accuracy, confusion_matrix = model_trainer.test(trained_three_classifier,test_loader3, device, num_classes=3)

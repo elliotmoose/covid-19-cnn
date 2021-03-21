@@ -31,10 +31,11 @@ def validation(model, testloader, criterion, device, num_classes=2):
         test_loss += criterion(output, labels).item()
         
         ps = torch.exp(output)
-        equality = (labels.data == ps.max(dim=1)[1])
+        predictions = ps.max(dim=1)[1]
+        equality = (labels.data == predictions)
         accuracy += equality.type(torch.FloatTensor).mean()
 
-        for label, prediction in zip(labels.view(-1), output.view(-1)):
+        for label, prediction in zip(labels.view(-1), predictions.view(-1)):
             confusion_matrix[label.long(), prediction.long()] += 1
 
     return test_loss, accuracy, confusion_matrix
@@ -52,10 +53,11 @@ def test(model, testloader, device='cuda', num_classes=2):
             output = model(images)
             
             ps = torch.exp(output)
-            equality = (labels.data == ps.max(dim=1)[1])
+            predictions = ps.max(dim=1)[1]
+            equality = (labels.data == predictions)
             accuracy += equality.type(torch.FloatTensor).mean()
 
-            for t, p in zip(labels.view(-1), output.view(-1)):
+            for t, p in zip(labels.view(-1), predictions.view(-1)):
                 confusion_matrix[t.long(), p.long()] += 1
         
         print('Testing Accuracy: {:.3f}'.format(accuracy/len(testloader)))
